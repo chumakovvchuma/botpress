@@ -1,7 +1,7 @@
 import { TelemetryRepository } from 'core/repositories/telemetry'
 import { TYPES } from 'core/types'
-import crypto from 'crypto'
 import { inject, injectable } from 'inversify'
+import { string } from 'joi'
 import ms from 'ms'
 
 import { JobService } from './job-service'
