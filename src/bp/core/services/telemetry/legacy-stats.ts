@@ -50,7 +50,13 @@ export class LegacyStats extends TelemetryStats {
       schema: '1.0.0',
       timestamp: new Date().toISOString(),
       uuid: uuid.v4(),
-      server: await this.getServerStats(),
+      server: {
+        ...(await this.getServerStats()),
+        machineUUID: await machineUUID(),
+        totalMemoryBytes: os.totalmem(),
+        uptime: Math.round(process.uptime()),
+        fingerprint: await this.getServerFingerprint()
+      },
       license: {
         type: process.IS_PRO_ENABLED ? 'pro' : 'ce',
         status: await this.getLicenseStatus(),
