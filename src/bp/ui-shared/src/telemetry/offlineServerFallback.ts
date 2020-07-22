@@ -1,16 +1,13 @@
 import axios, { AxiosInstance } from 'axios'
 import { TelemetryEvent } from 'common/telemetry'
-import _ from 'lodash'
 import ms from 'ms'
 
-export const setupOfflineTelemetryFallback = (api: AxiosInstance) => {
-  sendOfflineTelemetryPackages(api).catch()
-  setInterval(async () => await sendOfflineTelemetryPackages(api).catch(), ms('1h'))
-}
-
-export const sendTelemetryEvents = async (events: TelemetryEvent[]) => {
+export const sendEventsToTelemetryServer = async (events: TelemetryEvent[]) => {
   try {
-    await axios.post(window.TELEMETRY_URL, events)
+    await axios.post(
+      window.TELEMETRY_URL,
+      events.map(e => ({ ...e, source: 'client' }))
+    )
     return true
   } catch (err) {
     console.error('Could not send the telemetry packages to the storage server', err)
@@ -18,35 +15,35 @@ export const sendTelemetryEvents = async (events: TelemetryEvent[]) => {
   }
 }
 
-const sendOfflineTelemetryPackages = async (api: AxiosInstance) => {
-  try {
-    const { data: events } = await api.get(`/admin/telemetry-payloads`)
+export const startOfflineTelemetryFallback = (api: AxiosInstance) => {
+  sendSavedEventsRecursive()
+    .then(async () => {
+      setInterval(async () => await sendSavedEventsRecursive(), ms('30m'))
+    })
+    .catch() // silently fail
 
-    if (_.isEmpty(events)) {
-      return
+  async function sendSavedEventsRecursive() {
+    const events = await getSavedEvents()
+    if (!events.length) {
+      return // break recursivity
     }
+    const success = await sendEventsToTelemetryServer(events)
+    await sendFeedback(events, success)
 
-    const status = await sendEventsToStorage(api, events)
-
-    if (!status) {
-      return
-    }
-  } catch (err) {
-    console.error('Could not access the botpress server', err)
-
-    return
+    await sendSavedEventsRecursive()
   }
 
-  await sendOfflineTelemetryPackages(api)
-}
+  async function getSavedEvents(): Promise<TelemetryEvent[]> {
+    try {
+      const { data } = await api.get(`/telemetry/events`)
+      return data
+    } catch (err) {
+      return []
+    }
+  }
 
-const sendEventsToStorage = async (api: AxiosInstance, events) => {
-  debugger
-  const post = events.map(e => ({ ...e, source: 'client' }))
-
-  const status = await sendTelemetryEvents(post)
-
-  await api.post(`/admin/telemetry-feedback`, { events: events.map(e => e.uuid), status })
-
-  return status
+  async function sendFeedback(events: TelemetryEvent[], success: boolean): Promise<void> {
+    const payload = { events: events.map(e => e.uuid), success }
+    return api.post(`/telemetry/feedback`, payload)
+  }
 }
