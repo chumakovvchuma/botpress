@@ -3,9 +3,9 @@ import { TelemetryEvent } from 'common/telemetry'
 import _ from 'lodash'
 import ms from 'ms'
 
-export const setupOfflineTelemetryFallback = (api: AxiosInstance, path: string) => {
-  sendOfflineTelemetryPackages(api, path).catch()
-  setInterval(async () => await sendOfflineTelemetryPackages(api, path).catch(), ms('1h'))
+export const setupOfflineTelemetryFallback = (api: AxiosInstance) => {
+  sendOfflineTelemetryPackages(api).catch()
+  setInterval(async () => await sendOfflineTelemetryPackages(api).catch(), ms('1h'))
 }
 
 export const sendTelemetryEvents = async (events: TelemetryEvent[]) => {
@@ -18,7 +18,7 @@ export const sendTelemetryEvents = async (events: TelemetryEvent[]) => {
   }
 }
 
-const sendOfflineTelemetryPackages = async (api: AxiosInstance, path: string) => {
+const sendOfflineTelemetryPackages = async (api: AxiosInstance) => {
   try {
     const { data: events } = await api.get(`/admin/telemetry-payloads`)
 
@@ -26,7 +26,7 @@ const sendOfflineTelemetryPackages = async (api: AxiosInstance, path: string) =>
       return
     }
 
-    const status = await sendEventsToStorage(api, path, events)
+    const status = await sendEventsToStorage(api, events)
 
     if (!status) {
       return
@@ -37,10 +37,11 @@ const sendOfflineTelemetryPackages = async (api: AxiosInstance, path: string) =>
     return
   }
 
-  await sendOfflineTelemetryPackages(api, path)
+  await sendOfflineTelemetryPackages(api)
 }
 
-const sendEventsToStorage = async (api: AxiosInstance, path, events) => {
+const sendEventsToStorage = async (api: AxiosInstance, events) => {
+  debugger
   const post = events.map(e => ({ ...e, source: 'client' }))
 
   const status = await sendTelemetryEvents(post)

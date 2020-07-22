@@ -62,4 +62,4 @@ if (!window.BOT_ID) {
   )
 }
 
-telemetry.setupOfflineTelemetryFallback(axios.create(), '/studio')
+telemetry.setupOfflineTelemetryFallback(axios.create())
