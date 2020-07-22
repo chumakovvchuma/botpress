@@ -66,7 +66,7 @@ declare module 'botpress/shared' {
 
   export const telemetry: {
     setupOfflineTelemetryFallback(api: AxiosInstance, path: string): void
-    sendTelemetryEvents(events: TelemetryEvent[]): string
+    sendTelemetryEvents(events: TelemetryEvent[]): boolean
   }
 
   export const Icons: {
