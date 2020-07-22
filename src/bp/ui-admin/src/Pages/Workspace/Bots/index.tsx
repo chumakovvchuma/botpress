@@ -76,7 +76,7 @@ class Bots extends Component<Props> {
       this.props.fetchLicensing()
     }
 
-    telemetry.setupOfflineTelemetryFallback(api.getSecured(), '/admin')
+    telemetry.setupOfflineTelemetryFallback(api.getSecured())
   }
 
   toggleCreateBotModal = () => {
