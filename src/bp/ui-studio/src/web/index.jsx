@@ -62,4 +62,4 @@ if (!window.BOT_ID) {
   )
 }
 
-telemetry.setupOfflineTelemetryFallback(axios.create({ baseURL: window.API_PATH }))
+telemetry.startOfflineTelemetryFallback(axios.create({ baseURL: window.API_PATH }))
