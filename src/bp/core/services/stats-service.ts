@@ -1,5 +1,6 @@
 import { TelemetryRepository } from 'core/repositories/telemetry'
 import { TYPES } from 'core/types'
+import crypto from 'crypto'
 import { inject, injectable } from 'inversify'
 import ms from 'ms'
 
