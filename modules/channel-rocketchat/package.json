@@ -1,0 +1,29 @@
+{
+  "name": "channel-rocketchat",
+  "version": "1.0.0",
+  "description": "Rocket.Chat integration",
+  "private": true,
+  "main": "dist/backend/index.js",
+  "repository": {
+    "url": "https://github.com/metsrl/channel-rocketchat",
+    "type": "git"
+  },
+  "author": "Michele Bollini Met srl <michele.bollini@met.it>",
+  "license": "AGPL-3.0-only",
+  "scripts": {
+    "build": "node ../../build/module-builder/bin/entry build",
+    "watch": "node ../../build/module-builder/bin/entry watch",
+    "package": "node ../../build/module-builder/bin/entry package"
+  },
+  "dependencies": {
+   "@rocket.chat/sdk": "^0.2.9"
+  },
+  "engines": {
+    "node": "> 8.0.0",
+    "npm": "> 5.0.0"
+  },
+  "resolutions": {
+    "lodash": ">=4.17.12"
+  }
+
+}
